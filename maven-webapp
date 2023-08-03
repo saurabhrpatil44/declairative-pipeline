@@ -59,6 +59,7 @@ pipeline {
     }
 }
 
+//sudo usermod -aG docker jenkins
 //vi docker-compose.yml
 //version : "3.3"
 //services :

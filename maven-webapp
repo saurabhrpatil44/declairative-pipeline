@@ -50,5 +50,19 @@ pipeline {
                 }
             }
         }
+        stage ('Deploy on container') {
+            steps {
+                sh 'docker-compose down && docker-compose up -d'                
+                }
+            }
+        }
     }
 }
+
+//vi docker-compose.yml
+//version : "3.3"
+//services :
+//  web :
+//    build: .
+//    ports: 
+//      - "8080:8000"

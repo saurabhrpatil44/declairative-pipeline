@@ -1,0 +1,69 @@
+pipeline {
+    
+    agent any
+    
+    tools {
+        maven 'maven-3.9.2'
+    }
+    
+    stages {
+        stage ('Git Clone') {
+            steps {
+                cleanWs()
+                git branch: 'master', url: 'https://github.com/saurabhrpatil44/sonar-scanning-examples.git'
+                
+            }
+        }
+        
+        stage ('build war') {
+            steps {
+                sh '''ls -l
+                cd sonarqube-scanner-maven/maven-basic/
+                mvn clean package
+                '''
+            }
+        }
+        
+        stage ('Test') {
+            steps {
+                sh '''cd sonarqube-scanner-maven/maven-basic
+                mvn test
+                '''
+            }
+        }
+        
+        stage ('SonarQube') {
+            steps {
+                withSonarQubeEnv('sonar-server') {
+                    sh '''cd sonarqube-scanner-maven/maven-basic/
+                    mvn clean verify sonar:sonar -Dsonar.projectKey=webapp -Dsonar.projectName='webapp'
+                    '''
+                }
+            }
+        }
+        
+        /*stage ('SonarQube') {
+            steps {
+                withSonarQubeEnv('sonar-server') {
+                    sh 'cd sonarqube-scanner-maven/maven-basic/'
+                    sh "mvn sonar:sonar -Dsonar.projectKey=webapp -Dsonar.projectName='webapp'"
+                }
+            }
+        }*/
+        
+        /*stage ('Code Quality Check') {
+            steps {
+                sh 'cd sonarqube-scanner-maven/maven-basic/'
+                sh 'mvn checkstyle:checkstyle'
+                recordIssues(tools: [checkStyle()])
+            }
+        }*/
+        
+        /*stage ('Code Coverage') {
+            steps {
+                sh 'cd sonarqube-scanner-maven/maven-basic/'
+                jacoco maximumBranchCoverage: '80', maximumClassCoverage: '80', maximumComplexityCoverage: '80', maximumInstructionCoverage: '80', maximumLineCoverage: '80', maximumMethodCoverage: '80', minimumBranchCoverage: '80', minimumClassCoverage: '808', minimumComplexityCoverage: '80', minimumInstructionCoverage: '80', minimumLineCoverage: '80', minimumMethodCoverage: '80'
+            }
+        }*/
+    }
+}
